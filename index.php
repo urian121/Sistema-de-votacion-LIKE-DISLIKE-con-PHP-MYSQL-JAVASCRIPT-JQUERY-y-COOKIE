@@ -38,7 +38,7 @@ $dataPeliculas  = mysqli_query($con, $sqlPeliculas);
 
   <span>
   <i class="far fa-thumbs-down iconVotoDislike" id="dislike" data-id="<?php echo $rowPelicula["id"]; ?>"></i>
-    <span id="respuestaVoto<?php echo $rowPelicula["id"]; ?>"> <?php echo $rowPelicula["megusta"]; ?></span>
+    <span id="respuestaVotoDisLike<?php echo $rowPelicula["id"]; ?>"> <?php echo $rowPelicula["nomegusta"]; ?></span>
   </span>
   </p>
   </li>
