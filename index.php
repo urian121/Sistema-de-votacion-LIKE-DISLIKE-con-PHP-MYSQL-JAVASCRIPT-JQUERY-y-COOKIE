@@ -25,19 +25,22 @@ $dataPeliculas  = mysqli_query($con, $sqlPeliculas);
 <ul class="flex-container">
 <?php
  while ($rowPelicula = mysqli_fetch_array($dataPeliculas)) {
-   $idPelicula = "userLike".$rowPelicula["id"];
-  ?>
-  <li class="flex-item"><img class="fotoPelicula" src="imgs/peliculas/<?php echo $rowPelicula["url_foto"]; ?>" alt="">
+   $miCookiesvotoLike = "userLike".$rowPelicula["id"];
+   $miCookiesvotoDislike = "userDisLike".$rowPelicula["id"];
+?>
+  <li class="flex-item">
+    <img class="fotoPelicula" src="imgs/peliculas/<?php echo $rowPelicula["url_foto"]; ?>" alt="">
   <p style="display: flex; justify-content: space-around;">
 
   <!--aplicando el operador ternario para agregar la clase checkenlike -->
   <span>
-  <i class="far fa-thumbs-up iconVotoLike <?php echo isset($_COOKIE[$idPelicula]) ? 'checkenlike' : '' ?>" id="like<?php echo $rowPelicula["id"]; ?>" data-id="<?php echo $rowPelicula["id"]; ?>"></i> 
+  <i class="far fa-thumbs-up iconVotoLike <?php echo isset($_COOKIE[$miCookiesvotoLike]) ? 'checkenlike' : '' ?>" id="like<?php echo $rowPelicula["id"]; ?>" data-id="<?php echo $rowPelicula["id"]; ?>"></i> 
     <span id="respuestaVotoLike<?php echo $rowPelicula["id"]; ?>"> <?php echo $rowPelicula["megusta"]; ?></span>
+    <span style="color: red; display:none;" id="yavote<?php echo $rowPelicula["id"]; ?>">Ya votaste</span>
   </span>
 
   <span>
-  <i class="far fa-thumbs-down iconVotoDislike" id="dislike" data-id="<?php echo $rowPelicula["id"]; ?>"></i>
+  <i class="far fa-thumbs-down iconVotoDislike <?php echo isset($_COOKIE[$miCookiesvotoDislike]) ? 'checkenlike' : '' ?>" id="dislike<?php echo $rowPelicula["id"]; ?>" data-id="<?php echo $rowPelicula["id"]; ?>"></i>
     <span id="respuestaVotoDisLike<?php echo $rowPelicula["id"]; ?>"> <?php echo $rowPelicula["nomegusta"]; ?></span>
   </span>
   </p>

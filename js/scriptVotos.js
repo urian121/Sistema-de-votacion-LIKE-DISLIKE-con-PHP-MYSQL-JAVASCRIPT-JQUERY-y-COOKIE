@@ -1,89 +1,77 @@
 $(function(){
-  //Accion para el Boton me Gusta Like
-  var clic = 1;
-  $(".iconVotoLike").click(function(){
-     if(clic==1){
-      clic = clic + 1;
-      likeVoto =1;
-      var idvotoPelicula   = $(this).attr("data-id"); //capturando el id de quien recibira el voto
-      
-      //enviando voto con Ajax
-      var like =1;
-      dataStringLike = 'accion='+ like +'&likeVoto=' + likeVoto +'&idvotoPelicula=' + idvotoPelicula;
-      $.ajax({
-          url: "accion_Like.php",
-          type: "POST",
-          data: dataStringLike,
-          success: function(data){
-            $("#like" + idvotoPelicula).addClass("checkenlike"); //Agrego clase de checke like
-            $("#respuestaVotoLike" + idvotoPelicula).html(data); // Mostrar la respuestas del script PHP.
-            console.log(data);
-          }
-        });
-     
-     } else{
-      clic = 1;
-      var idvotodislike   = $(this).attr("data-id");
-      //enviando voto con Ajax
-      var dislike = 0;
-      var dislikeVoto=0;
-      dataStringDislike = 'accion='+ dislike +'&dislikeVoto=' + dislikeVoto + '&idvotoPelicula=' + idvotodislike;
-       $.ajax({
-          url: "accion_Like.php",
-          type: "POST",
-          data: dataStringDislike,
-          success: function(data){
-            $('#like' + idvotodislike).removeClass('checkenlike'); //quito la clase
-           $("#respuestaVotoLike" + idvotodislike).html(data); // Mostrar la respuestas del script PHP.
-          }
-        });
-      
-     }   
-  });
-//Fin de las acciones para el boton me gusta Like
   
+  //Creando un token unico de votacion para evitar inyeccion SQL
+  var caracteres   = "abcdefghijkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ23467890";
+  var tokenVotacion = "";
+  for (i=1; i<=100; i++) tokenVotacion +=caracteres.charAt(Math.floor(Math.random()*caracteres.length)); 
+  //console.log(tokenVotacion.length + tokenVotacion );
 
-//Accion para el boton No me Gusta Dislike
-    var clicdis = 1;
-    $(".iconVotoDislike").click(function(){
-       if(clicdis==1){
-        clicdis = clicdis + 1;
-        likeVoto =1;
-        var idvotoPelicula   = $(this).attr("data-id"); //capturando el id de quien recibira el voto
-        
-        //enviando voto con Ajax
-        var menoslike =0;
-        dataStringLike = 'accion='+ menoslike +'&idvotoPelicula=' + idvotoPelicula;
-        $.ajax({
-            url: "accion_Dislike.php",
-            type: "POST",
-            data: dataStringLike,
-            success: function(data){
-              $("#like" + idvotoPelicula).addClass("checkenlike"); //Agrego clase de checke like
-              $("#respuestaVotoDisLike" + idvotoPelicula).html(data); // Mostrar la respuestas del script PHP.
-              console.log(data);
-            }
-          });
-       
-       } else{
-        clicdis = 1;
-        var idvotodislike   = $(this).attr("data-id");
-        //enviando voto con Ajax
-        var dislike = 0;
-        var dislikeVoto=1;
-        dataStringDislike = 'accion='+ dislike + '&idvotoPelicula=' + idvotodislike;
-         $.ajax({
-            url: "accion_Dislike.php",
-            type: "POST",
-            data: dataStringDislike,
-            success: function(data){
-              $('#like' + idvotodislike).removeClass('checkenlike'); //quito la clase
-             $("#respuestaVotoDisLike" + idvotodislike).html(data); // Mostrar la respuestas del script PHP.
-            }
-          });
-        
-       }   
+  //Accion para el Boton me Gusta Like
+  $('.iconVotoLike').click(function(e){
+      e.preventDefault();
+      var idvotoPeliculaLike   = $(this).attr("data-id"); //capturando el id de quien recibira el voto
+      var like =1;
+      
+    //enviando voto con Ajax
+    dataStringLike = 'accion='+ like + '&idvotoPelicula=' + idvotoPeliculaLike + '&token=' + tokenVotacion;
+    $.ajax({
+        url: "accion_Like_Dislike.php",
+        type: "POST",
+        dataType: "json",
+        data: dataStringLike,
+        success: function(data){
+          if(data.success === 0){
+            console.log('succes: ' + data.success);
+            $("#yavote" + idvotoPeliculaLike).delay(500).fadeIn("slow");
+            setTimeout(
+              ()=>{
+                  $("#yavote" + idvotoPeliculaLike).hide(); 
+              } , 2000
+          );  
+          console.log(data.success);
+          }else if(data.success === 1){
+            console.log('succes: ' + data.success);
+            $("#like" + idvotoPeliculaLike).addClass("checkenlike"); //Agrego clase de checke like
+            $("#respuestaVotoLike" + idvotoPeliculaLike).html(data.mensaje); // Mostrar la respuestas del script PHP.
+          }
+
+        }
+      });
+      return false;
+  });
+
+
+
+  //Accion para el Boton No me Gusta DisLike  
+  $('.iconVotoDislike').click(function(e){
+    e.preventDefault();
+    var idvotodislike   = $(this).attr("data-id");
+    var dislike = 0;
+    
+    //enviando voto con Ajax
+    dataStringDislike = 'accion='+ dislike + '&idvotoPelicula=' + idvotodislike + '&token=' + tokenVotacion;
+    $.ajax({
+        url: "accion_Like_Dislike.php",
+        type: "POST",
+        data: dataStringDislike,
+        success: function(data){
+          if(data.success === 2){
+            console.log('succes: ' + data.success);
+            $("#yavote" + idvotodislike).delay(500).fadeIn("slow");
+            setTimeout(
+              ()=>{
+                  $("#yavote" + idvotodislike).hide(); 
+              } , 2000
+          );  
+          }else if(data.success === 3){
+            console.log('succes: ' + data.success);
+            $("#respuestaVotoDisLike" + idvotodislike).html(data.mensaje); // Mostrar la respuestas del script PHP.
+           // $('#dislike' + idvotodislike).removeClass('checkenlike'); //quito la clase
+          }
+
+        }
+      });
+      return false;
     });
-  //Fin de las acciones para el boton me gusta Like
   
   });
